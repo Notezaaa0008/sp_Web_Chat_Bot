@@ -81,8 +81,7 @@
               {
                 initPayload: "/greet",
                 customData: { language: "en" },
-                socketUrl: "http://localhost:5005",
-                //
+                socketUrl: "https://ogcsmartchatbot-qa-endpoint.pttplc.com",
                 socketPath: "/socket.io/",
                 title: "OGC Smart Chatbot",
                 showMessageDate: true,
@@ -94,7 +93,6 @@
                   bot_uttered: e => {
                     if (e.attachment) {
                       listImg.push(e.attachment);
-                      // this.setState({ listImg: [...this.state.listImg, e.attachment] });
                       // set timeout response
                       setTimeout(() => this.addEventToImg(), (listImg.length + 1) * 1000);
                     }
