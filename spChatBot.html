@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OGC Smart Chatbot</title>
+    <style>
+      .rw-conversation-container .rw-header {
+        background-color: rgb(0, 70, 239) !important;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="popupImg"></div>
+    <script>
+      let listImg = [];
+      function handleViewImg(e) {
+        e.preventDefault();
+        let image = e.target.currentSrc;
+        let viewImage = document.getElementById("popupImg");
+        viewImage.innerHTML = `<div className="popup-img" style="position: fixed;
+          top: 0;
+          left: 0;
+          width: 100% !important;
+          height: 100vh !important;
+          background-color: rgba(0, 0, 0, 0.6);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          z-index: 10000 !important;">
+        <div>
+          <div>
+            <a className="close-img" onclick="handleClose()" style="position: absolute;
+            top: 20px;
+            right: 20px;
+            text-decoration: none;
+            cursor: pointer;
+            z-index: 2 !important;">
+              &#10060;
+            </a>
+          </div>
+          <div>
+            <img className="popup-inner-img" src="${image}" style="position: relative;
+              width: 100%;
+              max-width: 900px !important;
+              max-height: 700px !important;
+              object-fit: fill !important;
+              border-radius: 15px;
+              text-align: center;
+              z-index: 1 !important;"></img>
+          </div>
+        </div>
+      </div>`;
+      }
+
+      function handleClose() {
+        let closeImage = document.getElementById("popupImg");
+        closeImage.removeChild(closeImage.firstElementChild);
+      }
+
+      function addEventToImg() {
+        let elementImg = document.getElementsByClassName("rw-image-frame");
+        for (let i = 0; i < elementImg.length; i++) {
+          elementImg[i].addEventListener("click", e => handleViewImg(e));
+        }
+        for (let j = 0; j < listImg.length; j++) {
+          listImg.pop();
+        }
+      }
+    </script>
+    <script>
+      !(function () {
+        let e = document.createElement("script"),
+          t = document.head || document.getElementsByTagName("head")[0];
+        (e.src = "https://cdn.jsdelivr.net/npm/rasa-webchat@1.0.1/lib/index.js"),
+          // Replace 1.x.x with the version that you want
+          (e.async = !0),
+          (e.onload = () => {
+            window.WebChat.default(
+              {
+                initPayload: "/greet",
+                customData: { language: "en" },
+                socketUrl: "http://localhost:5005",
+                //
+                socketPath: "/socket.io/",
+                title: "OGC Smart Chatbot",
+                showMessageDate: true,
+                inputTextFieldHint: "What's in your mind?...",
+                profileAvatar: "/image/logo-ptt.png",
+                tooltipPayload: "/greet",
+                docViewer: true,
+                onSocketEvent: {
+                  bot_uttered: e => {
+                    if (e.attachment) {
+                      listImg.push(e.attachment);
+                      // this.setState({ listImg: [...this.state.listImg, e.attachment] });
+                      // set timeout response
+                      setTimeout(() => this.addEventToImg(), (listImg.length + 1) * 1000);
+                    }
+                    console.log(listImg.length);
+                  },
+                  connect: () => setTimeout(() => this.addEventToImg(), 1500)
+                },
+                onWidgetEvent: {
+                  onChatClose: () => setTimeout(() => this.addEventToImg(), 500),
+                  onChatOpen: () => setTimeout(() => this.addEventToImg(), 500)
+                }
+                // add other props here
+              },
+              null
+            );
+          }),
+          t.insertBefore(e, t.firstChild);
+      })();
+    </script>
+  </body>
+</html>
